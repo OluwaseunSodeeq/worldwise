@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   MapContainer,
   TileLayer,
@@ -7,28 +7,43 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useCities } from "../Contexts/CitiesContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import { UseUrlPosition } from "../hooks/useUrlPosition";
+import Button from "./Button";
+import styles from "./Map.module.css";
 
 function Map() {
   const { cities } = useCities();
-
   const [mapPosition, setMapPosition] = useState([40, 0]);
-  const [searchParams] = useSearchParams();
-  const mapLat = searchParams.get("lat");
-  const mapLng = searchParams.get("lng");
-  // console.log(lat, lng, setSearchParams(), setMapPosition());
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    getPosition,
+  } = useGeolocation();
+
+  const [mapLat, mapLng] = UseUrlPosition();
 
   useEffect(() => {
-    if ((mapLat, mapLng)) setMapPosition([mapLat, mapLng]);
+    if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
   }, [mapLat, mapLng]);
+
+  useEffect(() => {
+    if (geolocationPosition)
+      setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+  }, [geolocationPosition]);
   return (
     <div className={styles.mapContainer}>
+      {!geolocationPosition && (
+        <Button type="position" onClick={getPosition}>
+          {isLoadingPosition ? "Loading.." : "Use your Position"}
+        </Button>
+      )}
+
       <MapContainer
         center={mapPosition}
-        // center={[mapLat, mapLng]}
-        zoom={8}
+        zoom={6}
         scrollWheelZoom={true}
         className={styles.map}
       >
@@ -59,9 +74,9 @@ function ChangeCenter({ position }) {
 }
 function DetectClick() {
   const navigate = useNavigate();
-
   useMapEvents({
-    click: (e) => navigate(`form?${e.latlng.lat}&lng=${e.latlng.lng}}`),
+    click: (e) => navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
   });
 }
+
 export default Map;

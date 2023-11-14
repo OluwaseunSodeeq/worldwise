@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// import { useEffect, useState } from "react";
 
 import Homepage from "./pages/Homepage";
 import Product from "./pages/Product";
@@ -29,6 +28,7 @@ function App() {
             <Route path="countries" element={<CountryList />} />
             <Route path="form" element={<Form />} />
           </Route>
+
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
