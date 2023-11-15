@@ -12,11 +12,10 @@ function formDate(date) {
 function CityItem({ city }) {
   const { currentCity, deleteCity } = useCities();
   const { cityName, emoji, date, id, position } = city;
-  console.log(id);
   // console.log(position.lat, position.lng);
 
   function handleClick(e) {
-    e.prevent();
+    e.preventDefault();
     deleteCity(id);
   }
   return (

@@ -9,6 +9,7 @@ const initialState = {
   currentCity: {},
   error: "",
 };
+
 function reducer(state, action) {
   switch (action.type) {
     case "loading":
@@ -19,15 +20,16 @@ function reducer(state, action) {
         cities: action.payload,
         isLoading: false,
       };
+    case "city/getCity":
+      return { ...state, currentCity: action.payload, isLoading: false };
     case "city/created":
       return {
         ...state,
         isLoading: false,
         cities: [...state.cities, action.payload],
+        currentCity: action.payload,
       };
 
-    case "city/getCity":
-      return { ...state, currentCity: action.payload, isLoading: false };
     case "city/delete":
       return {
         ...state,
@@ -45,6 +47,7 @@ function reducer(state, action) {
       throw new Error("Unknown action type");
   }
 }
+
 function CitiesProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { cities, isLoading, currentCity } = state;
@@ -73,6 +76,7 @@ function CitiesProvider({ children }) {
   }, []);
 
   async function getCity(id) {
+    if (Number(id) === currentCity.id) return;
     dispatch({ type: "loading" });
     try {
       const res = await fetch(`${BASE_URL}/cities/${id}`);
